@@ -1,3 +1,4 @@
+/Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/presentation/Logger.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/domain/state/FailedState.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/domain/model/ComponentQuantity.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/domain/state/CompletedState.java
@@ -14,6 +15,7 @@
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/domain/model/Paint.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/domain/model/Hardware.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/data/ComponentRepository.java
+/Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/domain/model/ProductionOrder.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/data/FileParser.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/application/ManufacturingService.java
 /Users/yigit/GitHub/G05_CENG431_HW2/src/main/java/com/manufacturing/system/domain/state/ManufacturingState.java

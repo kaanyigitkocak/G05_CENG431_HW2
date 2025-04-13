@@ -24,6 +24,12 @@ public interface Component {
     String getName();
     
     /**
+     * Bileşenin ID'sini döndürür
+     * @return Bileşen ID'si
+     */
+    String getId();
+    
+    /**
      * Bileşenin stok miktarını döndürür
      * @return Stok miktarı
      */

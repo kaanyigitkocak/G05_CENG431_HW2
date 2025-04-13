@@ -128,4 +128,15 @@ public class Product implements Component {
     public String toString() {
         return name;
     }
+    
+    /**
+     * Bir bileşeni belirtilen miktarda ürüne ekler.
+     * Bu metot, add(Component, int) metoduyla aynı işlevi görür.
+     * 
+     * @param component Eklenecek bileşen
+     * @param quantity Miktar
+     */
+    public void addComponent(Component component, int quantity) {
+        add(component, quantity);
+    }
 } 

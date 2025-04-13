@@ -3,39 +3,34 @@ package com.manufacturing.system.presentation;
 import com.manufacturing.system.application.ManufacturingService;
 
 /**
- * Kullanıcı arayüzünü sağlayan sınıf.
- * GRASP - Controller prensibine uygun olarak kullanıcı etkileşimini yönetir.
+ * Kullanıcı arayüzü sınıfı.
+ * GRASP - Controller prensiplerini destekler, domain katmanını sunum katmanından ayırır.
  */
 public class ConsoleUI {
+    private final Logger logger;
     private final ManufacturingService manufacturingService;
-    
+
     public ConsoleUI() {
-        this.manufacturingService = new ManufacturingService();
+        // Debug modu kapalı olarak bir logger nesnesi oluştur
+        this.logger = new Logger(false);
+        // Logger kullanarak ManufacturingService örneği oluştur
+        this.manufacturingService = new ManufacturingService(logger);
     }
-    
+
     /**
-     * Üretim sürecini başlatır ve sonuçları gösterir
-     * @param componentsFilePath Bileşen dosya yolu
-     * @param productsFilePath Ürün dosya yolu
+     * Üretim sürecini başlatır ve sonuçları görüntüler
      */
-    public void startManufacturingProcess(String componentsFilePath, String productsFilePath) {
-        try {
-            System.out.println("======================================================");
-            System.out.println("            ÜRETİM FİRMASI SİSTEMİ                   ");
-            System.out.println("======================================================");
-            
-            // Application katmanındaki servis üzerinden üretim sürecini başlat
-            String report = manufacturingService.startManufacturing(componentsFilePath, productsFilePath);
-            
-            // Özet raporu göster
-            System.out.println(report);
-            
-            System.out.println("======================================================");
-            System.out.println("            İŞLEM TAMAMLANDI                         ");
-            System.out.println("======================================================");
-        } catch (Exception e) {
-            System.err.println("Üretim sürecinde hata oluştu: " + e.getMessage());
-            e.printStackTrace();
-        }
+    public void startManufacturingProcess() {
+        // Konsola başlık yaz
+        logger.log("\n========== ÜRETİM FİRMASI SİSTEMİ ==========\n");
+        
+        // ManufacturingService üzerinden üretim sürecini başlat
+        String report = manufacturingService.startManufacturing();
+        
+        // Üretim raporu çıktısını göster
+        logger.log(report);
+        
+        // Program sonunu belirt
+        logger.log("\n========== PROGRAM SONLANDI ==========");
     }
 } 
