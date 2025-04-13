@@ -28,11 +28,17 @@ public class ProductRepository {
             return orders;
         }
         
+        // ComponentMap anahtarlarını yazdır - debug
+        System.out.println("ComponentMap anahtarları: " + componentMap.keySet());
+        
         for (Map<String, String> record : records) {
             String productName = record.get("Product Name");
             if (productName == null || productName.isEmpty()) {
                 continue; // Ürün adı yoksa atla
             }
+            
+            System.out.println("\nÜrün yükleniyor: " + productName);
+            System.out.println("Kayıt anahtarları: " + record.keySet());
             
             // Ürün miktarını al
             int quantity = 0;
@@ -47,11 +53,13 @@ public class ProductRepository {
             String productId = productName.toLowerCase().replace(" ", "_");
             Product product = new Product(productId, productName, 0);
             
+            int bilesenSayisi = 0;
+            
             // Tüm bileşenleri dolaş ve ürüne ekle
             for (String componentName : componentMap.keySet()) {
                 if (record.containsKey(componentName)) {
                     String quantityStr = record.get(componentName);
-                    if (quantityStr != null && !quantityStr.isEmpty()) {
+                    if (quantityStr != null && !quantityStr.isEmpty() && !quantityStr.equals("0")) {
                         try {
                             double componentQty = Double.parseDouble(quantityStr);
                             if (componentQty > 0) {
@@ -60,14 +68,28 @@ public class ProductRepository {
                                     // Ondalıklı miktarları tam sayıya yuvarla
                                     int intQuantity = (int)Math.ceil(componentQty);
                                     product.add(component, intQuantity);
+                                    
+                                    // Debug bilgisi
+                                    System.out.println("  - Bileşen eklendi: " + componentName + 
+                                                      " (" + intQuantity + " adet)" +
+                                                      " Maliyet: " + component.getCost() + 
+                                                      " Ağırlık: " + component.getWeight());
+                                    bilesenSayisi++;
+                                } else {
+                                    System.out.println("  - HATA: Bileşen bulunamadı: " + componentName);
                                 }
                             }
                         } catch (NumberFormatException e) {
-                            System.out.println("Bileşen miktarı okunamadı: " + componentName + " - " + quantityStr);
+                            System.out.println("  - HATA: Bileşen miktarı okunamadı: " + componentName + " - " + quantityStr);
                         }
                     }
                 }
             }
+            
+            // Ürün toplam maliyet ve ağırlık kontrolü
+            System.out.println("  Ürün toplam bileşen sayısı: " + bilesenSayisi);
+            System.out.println("  Ürün toplam maliyet: " + product.getCost());
+            System.out.println("  Ürün toplam ağırlık: " + product.getWeight());
             
             orders.add(new ProductionOrder(product, quantity));
         }
