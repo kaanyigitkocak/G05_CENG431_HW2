@@ -1,0 +1,6 @@
+id,name,component_ids,component_quantities,quantity
+P001,Masa,RM001;H001;P001,4;20;2,5
+P002,Sandalye,RM001;RM002;H001;P001,2;4;8;1,10
+P003,Sehpa,RM001;H001;P002,1;10;1,8
+P004,Dolap,RM001;H001;H002;P003,6;30;8;3,3
+P005,TV Ünitesi,RM001;RM003;H001;H003;P002,5;2;25;4;2,4
