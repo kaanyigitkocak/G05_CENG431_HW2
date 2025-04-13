@@ -27,18 +27,23 @@ public class FileParser {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             // İlk satırı başlık olarak oku
             if ((line = br.readLine()) != null) {
-                headers = line.split(",");
+                headers = line.split(";");
             }
             
             // Diğer satırları oku
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
+                String[] values = line.split(";");
                 Map<String, String> record = new HashMap<>();
                 
                 // Başlıklar ve değerleri eşleştir
                 for (int i = 0; i < headers.length; i++) {
                     if (i < values.length) {
-                        record.put(headers[i].trim(), values[i].trim());
+                        String value = values[i].trim();
+                        // Ondalık sayılarda virgül yerine nokta kullan
+                        if (value.contains(",")) {
+                            value = value.replace(",", ".");
+                        }
+                        record.put(headers[i].trim(), value);
                     } else {
                         record.put(headers[i].trim(), ""); // Eksik değerler için boş değer ekle
                     }

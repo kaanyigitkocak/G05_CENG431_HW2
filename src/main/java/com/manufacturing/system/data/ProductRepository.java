@@ -23,26 +23,49 @@ public class ProductRepository {
         List<ProductionOrder> orders = new ArrayList<>();
         List<Map<String, String>> records = FileParser.parseCSV(filePath);
         
+        if (records.isEmpty()) {
+            System.out.println("Ürün CSV dosyası boş veya okunamadı!");
+            return orders;
+        }
+        
         for (Map<String, String> record : records) {
-            String id = record.get("id");
-            String name = record.get("name");
-            int quantity = Integer.parseInt(record.get("quantity"));
+            String productName = record.get("Product Name");
+            if (productName == null || productName.isEmpty()) {
+                continue; // Ürün adı yoksa atla
+            }
             
-            Product product = new Product(id, name, 0);
+            // Ürün miktarını al
+            int quantity = 0;
+            try {
+                quantity = Integer.parseInt(record.get("Quantity"));
+            } catch (NumberFormatException e) {
+                System.out.println("Miktar değeri okunamadı: " + record.get("Quantity"));
+                continue;
+            }
             
-            // Ürün bileşenlerini ekle (products.csv'deki format)
-            String[] componentIds = record.get("component_ids").split(";");
-            String[] componentQtys = record.get("component_quantities").split(";");
+            // Ürünü oluştur
+            String productId = productName.toLowerCase().replace(" ", "_");
+            Product product = new Product(productId, productName, 0);
             
-            for (int i = 0; i < componentIds.length; i++) {
-                String componentId = componentIds[i].trim();
-                int componentQty = Integer.parseInt(componentQtys[i].trim());
-                
-                Component component = componentMap.get(componentId);
-                if (component != null) {
-                    product.add(component, componentQty);
-                } else {
-                    System.out.println("Ürün " + id + " için bileşen bulunamadı: " + componentId);
+            // Tüm bileşenleri dolaş ve ürüne ekle
+            for (String componentName : componentMap.keySet()) {
+                if (record.containsKey(componentName)) {
+                    String quantityStr = record.get(componentName);
+                    if (quantityStr != null && !quantityStr.isEmpty()) {
+                        try {
+                            double componentQty = Double.parseDouble(quantityStr);
+                            if (componentQty > 0) {
+                                Component component = componentMap.get(componentName);
+                                if (component != null) {
+                                    // Ondalıklı miktarları tam sayıya yuvarla
+                                    int intQuantity = (int)Math.ceil(componentQty);
+                                    product.add(component, intQuantity);
+                                }
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Bileşen miktarı okunamadı: " + componentName + " - " + quantityStr);
+                        }
+                    }
                 }
             }
             

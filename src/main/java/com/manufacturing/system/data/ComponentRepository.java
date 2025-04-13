@@ -24,33 +24,68 @@ public class ComponentRepository {
         Map<String, Component> componentMap = new HashMap<>();
         List<Map<String, String>> records = FileParser.parseCSV(filePath);
         
+        System.out.println("CSV başlıkları: " + records.get(0).keySet());
+        
         for (Map<String, String> record : records) {
-            String id = record.get("id");
-            String type = record.get("type");
-            String name = record.get("name");
-            double cost = Double.parseDouble(record.get("cost"));
-            double weight = Double.parseDouble(record.get("weight"));
-            int stock = Integer.parseInt(record.get("stock"));
-            
-            Component component;
-            
-            // Bileşen türüne göre uygun nesneyi oluştur
-            switch (type.toLowerCase()) {
-                case "raw_material":
-                    component = new RawMaterial(id, name, cost, weight, stock);
-                    break;
-                case "paint":
-                    component = new Paint(id, name, cost, weight, stock);
-                    break;
-                case "hardware":
-                    component = new Hardware(id, name, cost, weight, stock);
-                    break;
-                default:
-                    System.out.println("Bilinmeyen bileşen türü: " + type);
-                    continue;
+            // Yeni CSV dosya formatına göre alanlar
+            String name = record.get("Component");
+            if (name == null || name.isEmpty()) {
+                System.out.println("Bileşen adı bulunamadı. Kayıt atlanıyor: " + record);
+                continue;
             }
             
-            componentMap.put(id, component);
+            // Diğer alanları kontrol et ve dönüştür
+            String costStr = record.get("Unit Cost (TL)");
+            String weightStr = record.get("Unit Weight (kg)");
+            String type = record.get("Type");
+            String stockStr = record.get("Stock Quantity");
+            
+            if (costStr == null || weightStr == null || type == null || stockStr == null) {
+                System.out.println("Eksik veri. Kayıt atlanıyor: " + record);
+                continue;
+            }
+            
+            try {
+                double cost = Double.parseDouble(costStr);
+                double weight = Double.parseDouble(weightStr);
+                
+                // Stock Quantity içindeki sayısal olmayan karakterleri temizle
+                int stock = 0;
+                try {
+                    stockStr = stockStr.replaceAll("[^0-9]", "").trim();
+                    if (!stockStr.isEmpty()) {
+                        stock = Integer.parseInt(stockStr);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Stok değeri okunamadı: " + stockStr + ", 0 olarak ayarlanıyor");
+                }
+                
+                // Her bileşene, adını kullanarak bir ID atayalım
+                String id = name.toLowerCase().replace(" ", "_");
+                
+                Component component;
+                
+                // Bileşen türüne göre uygun nesneyi oluştur
+                switch (type.toLowerCase()) {
+                    case "raw material":
+                        component = new RawMaterial(id, name, cost, weight, stock);
+                        break;
+                    case "paint":
+                        component = new Paint(id, name, cost, weight, stock);
+                        break;
+                    case "hardware":
+                        component = new Hardware(id, name, cost, weight, stock);
+                        break;
+                    default:
+                        System.out.println("Bilinmeyen bileşen türü: " + type);
+                        continue;
+                }
+                
+                componentMap.put(name, component); // Bileşen haritasına ekle (ürün CSV'si için ad kullanılacak)
+                System.out.println("Bileşen eklendi: " + name);
+            } catch (NumberFormatException e) {
+                System.out.println("Sayısal değer okunamadı. Kayıt atlanıyor: " + record + " Hata: " + e.getMessage());
+            }
         }
         
         return componentMap;
