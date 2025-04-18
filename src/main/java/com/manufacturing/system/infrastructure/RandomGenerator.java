@@ -2,41 +2,33 @@ package com.manufacturing.system.infrastructure;
 
 import java.util.Random;
 
-/**
- * Rastgele sayı üretimi için altyapı sınıfı.
- * GRASP - Indirection/Low Coupling prensiplerine uygun olarak
- * rastgele sayı üretimini sağlayan bir aracı sınıf.
- */
 public class RandomGenerator {
     private static final Random random = new Random();
     
-    private RandomGenerator() {
-        // Utility sınıfını örneklemeyi engellemek için private constructor
-    }
+    private RandomGenerator() { }
     
     /**
-     * Belirtilen aralıkta rastgele sayı üretir
-     * @param min Minimum değer (dahil)
-     * @param max Maksimum değer (dahil)
-     * @return Üretilen rastgele sayı
+     * Generates random numbers in the specified range
+     * @param min Minimum value
+     * @param max Maximum value
+     * @return Generated number
      */
     public static int generateNumber(int min, int max) {
-        // min dahil, max dahil olacak şekilde değer üretir
         return min + random.nextInt(max - min + 1);
     }
     
     /**
-     * Üretim sonuç durumunu rastgele belirler
-     * @return 1: Başarılı, 2: Sistem Hatası, 3: Hasarlı Bileşen
+     * Randomly determines the production outcome
+     * @return 1: Successful, 2: System Error, 3: Damaged Component
      */
     public static int generateManufacturingOutcome() {
         return generateNumber(1, 3);
     }
     
     /**
-     * Belirli bir olasılıkla başarı durumunu belirler
-     * @param successProbability Başarı olasılığı (0.0 - 1.0 arası)
-     * @return Başarılı ise true, değilse false
+     * Determines success with a certain probability
+     * @param successProbability probability of success (0.0 - 1.0)
+     * @return if success true, otherwise false
      */
     public static boolean isSuccessful(double successProbability) {
         return random.nextDouble() < successProbability;

@@ -1,24 +1,21 @@
 package com.manufacturing.system.domain.state;
 
-/**
- * Stok için bekleme durumu.
- * Üretim sürecinin ilk durumudur.
- */
+
 public class WaitingForStockState implements ManufacturingState {
     
     @Override
     public void handle(ManufacturingProcess context) {
-        System.out.println("Stok kontrolü yapılıyor...");
+        System.out.println("Stock control is being carried out...");
         
         // Ürünün bileşenlerinin stok kontrolü
         if (context.getProduct().checkComponentsStock()) {
-            System.out.println("Stok yeterli. Üretim aşamasına geçiliyor.");
+            System.out.println("The stock is sufficient. The production phase is starting.");
             context.setState(new InManufacturingState());
             context.getCurrentState().handle(context);
         } else {
-            System.out.println("Stok yetersiz. Üretim başarısız.");
-            context.setFailureReason("Stok Yetersizliği");
-            context.setState(new FailedState("Stok Yetersizliği"));
+            System.out.println("Insufficient stock. Production failure.");
+            context.setFailureReason("Insufficient Stock");
+            context.setState(new FailedState("Insufficient Stock"));
             context.incrementStockShortageCount();
             context.getCurrentState().handle(context);
         }
@@ -26,6 +23,6 @@ public class WaitingForStockState implements ManufacturingState {
     
     @Override
     public String getName() {
-        return "Stok Kontrolü";
+        return "Stock Control";
     }
 } 

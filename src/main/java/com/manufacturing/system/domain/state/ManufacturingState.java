@@ -1,19 +1,15 @@
 package com.manufacturing.system.domain.state;
 
-/**
- * State Design Pattern'de State arayüzü.
- * Üretim sürecinin farklı durumlarını temsil eder.
- */
 public interface ManufacturingState {
     /**
-     * Durumun işlevini gerçekleştirir ve gerekirse yeni duruma geçiş yapar
-     * @param context Üretim süreci (context)
+     * Performs the function of the state and transitions to the new state if necessary
+     * @param context Production process
      */
     void handle(ManufacturingProcess context);
     
     /**
-     * Durumun adını döndürür
-     * @return Durum adı
+     * Returns the name of the state
+     * @return name of the state
      */
     String getName();
 } 

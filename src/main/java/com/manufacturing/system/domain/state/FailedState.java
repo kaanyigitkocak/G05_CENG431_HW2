@@ -1,9 +1,5 @@
 package com.manufacturing.system.domain.state;
 
-/**
- * Başarısız durum.
- * Üretim süreci başarısız olduğunda kullanılır.
- */
 public class FailedState implements ManufacturingState {
     private final String reason;
     
@@ -13,12 +9,12 @@ public class FailedState implements ManufacturingState {
     
     @Override
     public void handle(ManufacturingProcess context) {
-        System.out.println("Üretim başarısız oldu. Neden: " + reason);
+        System.out.println("Production failed. Reason: " + reason);
     }
     
     @Override
     public String getName() {
-        return "Başarısız: " + reason;
+        return "Failed: " + reason;
     }
     
     public String getReason() {

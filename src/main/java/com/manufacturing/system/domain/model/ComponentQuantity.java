@@ -1,8 +1,5 @@
 package com.manufacturing.system.domain.model;
 
-/**
- * Bir ürünün içindeki bileşen ve miktarını tutan yardımcı sınıf
- */
 public class ComponentQuantity {
     private final Component component;
     private final int quantity;

@@ -1,9 +1,5 @@
 package com.manufacturing.system.domain.model;
 
-/**
- * Component arayüzünü uygulayan temel soyut sınıf.
- * Tüm leaf (yaprak) bileşenler için ortak özellikleri barındırır.
- */
 public abstract class BaseComponent implements Component {
     private final String id;
     private final String name;
@@ -54,7 +50,7 @@ public abstract class BaseComponent implements Component {
     
     @Override
     public String generateReport() {
-        return String.format("%s (ID: %s) - Maliyet: %.2f, Ağırlık: %.2f, Stok: %d", 
+        return String.format("%s (ID: %s) - Cost: %.2f, Weight: %.2f, Stock: %d", 
                             name, id, cost, weight, stock);
     }
     

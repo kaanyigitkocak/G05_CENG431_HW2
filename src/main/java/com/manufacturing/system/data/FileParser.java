@@ -8,67 +8,48 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * CSV dosyalarını okumak için yardımcı sınıf.
- */
 public class FileParser {
     
     /**
-     * CSV dosyasını okur ve kayıtları döndürür.
-     * Türkçe decimal format (virgül ile yazılan) otomatik olarak İngilizce formata (nokta ile yazılan) dönüştürülür.
+     * Reads CSV file and returns records.
      * 
-     * @param filePath CSV dosya yolu
-     * @return Kayıtlar listesi (her kayıt bir Map olarak anahtar-değer çiftleri içerir)
+     * @param filePath CSV file path
+     * @return Mapped data list
      */
     public static List<Map<String, String>> parseCSV(String filePath) {
         List<Map<String, String>> records = new ArrayList<>();
         String line;
         String[] headers = null;
-        String separator = ";"; // CSV ayırıcı karakteri
+        String separator = ";";
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // İlk satırı oku (başlıklar)
             if ((line = br.readLine()) != null) {
                 headers = line.split(separator);
-                // Başlıkları temizle
                 for (int i = 0; i < headers.length; i++) {
                     headers[i] = headers[i].trim();
                 }
             }
 
-            // Başlık yoksa boş liste döndür
             if (headers == null || headers.length == 0) {
-                System.err.println("CSV başlıkları okunamadı: " + filePath);
+                System.err.println("Unable to read CSV headers: " + filePath);
                 return records;
             }
 
-            // Debug için başlıkları yazdır
-            System.out.println("CSV başlıkları: " + String.join(", ", headers));
-
-            // Veri satırlarını oku
+            System.out.println("CSV Headers: " + String.join(", ", headers));
             int rowCount = 0;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(separator);
                 Map<String, String> record = new HashMap<>();
-
-                // Her bir değeri ilgili başlık ile eşleştir
                 for (int i = 0; i < headers.length && i < values.length; i++) {
-                    // Değer varsa temizle ve kaydet
                     String value = (i < values.length && values[i] != null) ? values[i].trim() : "";
-                    
-                    // Türkçe ondalık formatını (1,23) İngilizce formata (1.23) dönüştür
                     if (value.contains(",")) {
-                        // Sayısal değer olma ihtimali var, virgülü noktaya çevir
                         try {
-                            // Önce boşlukları temizle
                             String trimmed = value.trim();
-                            // Eğer sadece sayı ve virgül içeriyorsa dönüştür
                             if (trimmed.matches("[0-9,]+")) {
                                 value = trimmed.replace(",", ".");
                             }
                         } catch (Exception e) {
-                            // Dönüştürme hatası olursa orijinal değeri kullan
-                            System.out.println("Ondalık dönüştürme hatası: " + value + " - " + e.getMessage());
+                            System.out.println("Decimal Conversion Error: " + value + " - " + e.getMessage());
                         }
                     }
                     
@@ -78,19 +59,18 @@ public class FileParser {
                 records.add(record);
                 rowCount++;
 
-                // İlk kaydı debug için yazdır
                 if (rowCount == 1) {
-                    System.out.println("İlk CSV kaydı:");
+                    System.out.println("First CSV Record:");
                     for (Map.Entry<String, String> entry : record.entrySet()) {
                         System.out.println("  " + entry.getKey() + " = '" + entry.getValue() + "'");
                     }
                 }
             }
 
-            System.out.println("Toplam " + rowCount + " kayıt okundu - " + filePath);
+            System.out.println("Total " + rowCount + " record read - " + filePath);
 
         } catch (IOException e) {
-            System.err.println("CSV dosyası okuma hatası: " + e.getMessage() + " - Dosya: " + filePath);
+            System.err.println("Error reading CSV file: " + e.getMessage() + " - File: " + filePath);
         }
 
         return records;

@@ -2,7 +2,6 @@ package com.manufacturing.system.application;
 
 import com.manufacturing.system.data.ComponentRepository;
 import com.manufacturing.system.data.ProductRepository;
-import com.manufacturing.system.domain.model.Component;
 import com.manufacturing.system.domain.model.Product;
 import com.manufacturing.system.domain.model.ProductionOrder;
 import com.manufacturing.system.domain.state.ManufacturingProcess;
@@ -11,10 +10,6 @@ import com.manufacturing.system.presentation.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Üretim süreçlerini koordine eden servis sınıfı.
- * GRASP - Controller prensibine uygun olarak domain nesneleri arasındaki etkileşimi yönetir.
- */
 public class ManufacturingService {
     private final ComponentRepository componentRepository;
     private final ProductRepository productRepository;
@@ -26,34 +21,26 @@ public class ManufacturingService {
         this.componentRepository = new ComponentRepository("src/main/resources/components.csv", logger);
         this.productRepository = new ProductRepository("src/main/resources/products.csv", componentRepository, logger);
     }
-    
-    /**
-     * Üretim sürecini başlatır
-     * @return Üretim sonuç raporu
-     */
+
     public String startManufacturing() {
-        logger.log("Üretim Firması Sistemi başlatılıyor...");
+        logger.log("Starting the Manufacturing Company System...");
         
-        // Veri katmanından bileşenleri yükle
-        logger.log("Bileşenler yükleniyor...");
+        logger.log("Loading components...");
         componentRepository.loadComponents();
         
-        // Veri katmanından ürünleri yükle
-        logger.log("Ürünler yükleniyor...");
+        logger.log("Products are loading...");
         productRepository.loadProducts();
         
-        // Üretim siparişlerini oluştur (Burada bir örnek oluşturuyoruz, gerçek uygulamada kullanıcı girişi veya dosyadan okunabilir)
         createSampleProductionOrders();
         
-        logger.log("\n=== Üretim Başlıyor ===");
+        logger.log("\n=== Production Begins ===");
         
-        // State Pattern kullanarak her ürün için üretim sürecini çalıştır
         List<ProductionOrder> orders = productRepository.getProductionOrders();
         for (ProductionOrder order : orders) {
             Product product = order.getProduct();
             int quantity = order.getQuantity();
             
-            logger.log("\n--- " + product.getName() + " Üretimi (" + quantity + " adet) ---");
+            logger.log("\n--- " + product.getName() + " Production (" + quantity + " quantity) ---");
             
             ManufacturingProcess process = new ManufacturingProcess(product, quantity);
             process.run();
@@ -62,35 +49,25 @@ public class ManufacturingService {
             logger.log(process.generateReport());
         }
         
-        logger.log("\n=== Üretim Tamamlandı ===");
+        logger.log("\n=== Production Completed ===");
         
         return generateSummaryReport();
     }
-    
-    /**
-     * Örnek üretim siparişleri oluşturur.
-     * Bu metot, ürünlerin tamamı için birer sipariş oluşturur.
-     */
+
     private void createSampleProductionOrders() {
         List<Product> products = productRepository.getAll();
         
-        logger.log("Üretim siparişleri oluşturuluyor...");
-        
-        // Her ürün için bir üretim siparişi oluştur
+        logger.log("Creating production orders...");
+
         for (Product product : products) {
-            // Her üründen 1 adet üretilecek
             ProductionOrder order = new ProductionOrder(product, 1);
             productRepository.addProductionOrder(order);
-            logger.log("Sipariş oluşturuldu: " + product.getName() + " - 1 adet");
+            logger.log("Order created: " + product.getName() + " - 1 quantity");
         }
         
-        logger.log("Toplam " + productRepository.getProductionOrders().size() + " sipariş oluşturuldu.");
+        logger.log("Total " + productRepository.getProductionOrders().size() + " order created.");
     }
-    
-    /**
-     * Tüm üretim süreçleri için özet rapor oluşturur
-     * @return Özet rapor
-     */
+
     public String generateSummaryReport() {
         int totalSuccess = 0;
         int totalSystemError = 0;
@@ -112,14 +89,14 @@ public class ManufacturingService {
         }
         
         StringBuilder report = new StringBuilder();
-        report.append("\n====== ÖZET RAPOR ======\n");
-        report.append("Toplam Başarılı Üretim: ").append(totalSuccess).append(" adet\n");
-        report.append("  - Toplam Maliyet: ").append(String.format("%.2f", totalCost)).append(" TL\n");
-        report.append("  - Toplam Ağırlık: ").append(String.format("%.2f", totalWeight)).append(" kg\n");
-        report.append("Toplam Başarısız Üretim: ").append(totalSystemError + totalDamagedComponent + totalStockShortage).append(" adet\n");
-        report.append("  - Sistem Hatası: ").append(totalSystemError).append(" adet\n");
-        report.append("  - Hasarlı Bileşen: ").append(totalDamagedComponent).append(" adet\n");
-        report.append("  - Stok Yetersizliği: ").append(totalStockShortage).append(" adet\n");
+        report.append("\n====== SUMMARY REPORT ======\n");
+        report.append("Total Successful Production: ").append(totalSuccess).append(" quantity\n");
+        report.append("  - Total Cost: ").append(String.format("%.2f", totalCost)).append(" TL\n");
+        report.append("  - Total Weight: ").append(String.format("%.2f", totalWeight)).append(" kg\n");
+        report.append("Total Unsuccessful Production: ").append(totalSystemError + totalDamagedComponent + totalStockShortage).append(" quantity\n");
+        report.append("  - System Error: ").append(totalSystemError).append(" quantity\n");
+        report.append("  - Damaged Component: ").append(totalDamagedComponent).append(" quantity\n");
+        report.append("  - Insufficient Stock: ").append(totalStockShortage).append(" quantity\n");
         
         return report.toString();
     }

@@ -1,8 +1,5 @@
 package com.manufacturing.system.domain.model;
 
-/**
- * Hammadde bileşeni (Leaf)
- */
 public class RawMaterial extends BaseComponent {
     
     public RawMaterial(String id, String name, double cost, double weight, int stock) {
@@ -11,6 +8,6 @@ public class RawMaterial extends BaseComponent {
     
     @Override
     public String generateReport() {
-        return "Hammadde: " + super.generateReport();
+        return "Raw Materials: " + super.generateReport();
     }
 } 

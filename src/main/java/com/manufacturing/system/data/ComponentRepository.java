@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Component nesnelerini depolamak ve yönetmek için kullanılan depo sınıfı.
- */
 public class ComponentRepository {
     private final List<Component> components;
     private final Logger logger;
@@ -21,54 +18,48 @@ public class ComponentRepository {
         this.componentsCsvPath = componentsCsvPath;
     }
 
-    /**
-     * CSV dosyasından bileşenleri yükler.
-     */
     public void loadComponents() {
         List<Map<String, String>> records = FileParser.parseCSV(componentsCsvPath);
         if (records.isEmpty()) {
-            logger.log("Uyarı: Bileşen CSV dosyası boş veya okunamadı. Dosya yolu: " + componentsCsvPath);
+            logger.log("Warning: Component CSV file is empty or unreadable. File path " + componentsCsvPath);
             return;
         }
 
-        logger.log("Bileşenler yükleniyor...");
+        logger.log("Loading components...");
         int successCount = 0;
         int errorCount = 0;
 
         for (Map<String, String> record : records) {
             try {
-                // CSV dosyasından gerekli alanları al
+                // Get required fields from CSV file
                 String name = record.get("Component");
                 String costStr = record.get("Unit Cost (TL)");
                 String weightStr = record.get("Unit Weight (kg)");
                 String type = record.get("Type");
                 String stockStr = record.get("Stock Quantity");
 
-                // Gerekli değerlerin varlığını kontrol et
                 if (name == null || name.isEmpty()) {
-                    logger.log("Hata: Bileşen adı eksik");
+                    logger.log("Error: Component name missing");
                     errorCount++;
                     continue;
                 }
                 if (type == null || type.isEmpty()) {
-                    logger.log("Hata: Bileşen tipi eksik - Bileşen: " + name);
+                    logger.log("Error: Component type is missing - Component: " + name);
                     errorCount++;
                     continue;
                 }
 
-                // Benzersiz ID oluştur (bileşen adını kullanarak)
                 String id = name.replaceAll("\\s+", "_").toLowerCase();
 
-                // Sayısal değerleri dönüştür
                 double cost = 0.0;
                 try {
                     if (costStr != null && !costStr.isEmpty()) {
                         cost = Double.parseDouble(costStr);
                     } else {
-                        logger.log("Uyarı: Maliyet değeri eksik, 0 kullanılacak - Bileşen: " + name);
+                        logger.log("Warning: Cost value is missing, 0 will be used - Component: " + name);
                     }
                 } catch (NumberFormatException e) {
-                    logger.log("Hata: Geçersiz maliyet değeri '" + costStr + "' - Bileşen: " + name + ". Hata: " + e.getMessage());
+                    logger.log("Error: Invalid cost value '" + costStr + "' - Component: " + name + ". Error: " + e.getMessage());
                     errorCount++;
                     continue;
                 }
@@ -78,48 +69,45 @@ public class ComponentRepository {
                     if (weightStr != null && !weightStr.isEmpty()) {
                         weight = Float.parseFloat(weightStr);
                     } else {
-                        logger.log("Uyarı: Ağırlık değeri eksik, 0 kullanılacak - Bileşen: " + name);
+                        logger.log("Warning: Weight value is missing, 0 will be used - Component: " + name);
                     }
                 } catch (NumberFormatException e) {
-                    logger.log("Hata: Geçersiz ağırlık değeri '" + weightStr + "' - Bileşen: " + name + ". Hata: " + e.getMessage());
+                    logger.log("Error: Invalid weight value '" + weightStr + "' - Component: " + name + ". Error: " + e.getMessage());
                     errorCount++;
                     continue;
                 }
 
-                // Stok değerini sayısal kısmını çıkar
                 int stock = 0;
                 try {
                     if (stockStr != null && !stockStr.isEmpty()) {
-                        // Stok değeri "1000 m²" gibi bir formatta olabilir, sadece sayısal kısmı al
                         String stockNumeric = stockStr.split("\\s+")[0];
                         stock = Integer.parseInt(stockNumeric);
                     } else {
-                        logger.log("Uyarı: Stok değeri eksik, 0 kullanılacak - Bileşen: " + name);
+                        logger.log("Warning: Stock value is missing, 0 will be used - Component: " + name);
                     }
                 } catch (Exception e) {
-                    logger.log("Hata: Geçersiz stok değeri '" + stockStr + "' - Bileşen: " + name + ". Hata: " + e.getMessage());
+                    logger.log("Error: Invalid stock value '" + stockStr + "' - Component: " + name + ". Error: " + e.getMessage());
                     errorCount++;
                     continue;
                 }
 
-                // Tip kontrolü ve bileşen oluşturma
                 Component component;
                 switch (type.toLowerCase().trim()) {
                     case "rawmaterial":
                     case "raw material":
                         component = new RawMaterial(id, name, cost, weight, stock);
-                        logger.log("Hammadde eklendi: " + name + " (ID: " + id + ", Maliyet: " + cost + ", Ağırlık: " + weight + ", Stok: " + stock + ")");
+                        logger.log("Raw material added: " + name + " (ID: " + id + ", Cost: " + cost + ", Weight: " + weight + ", Stock: " + stock + ")");
                         break;
                     case "paint":
                         component = new Paint(id, name, cost, weight, stock);
-                        logger.log("Boya eklendi: " + name + " (ID: " + id + ", Maliyet: " + cost + ", Ağırlık: " + weight + ", Stok: " + stock + ")");
+                        logger.log("Paint added: " + name + " (ID: " + id + ", Cost: " + cost + ", Weight: " + weight + ", Stock: " + stock + ")");
                         break;
                     case "hardware":
                         component = new Hardware(id, name, cost, weight, stock);
-                        logger.log("Donanım eklendi: " + name + " (ID: " + id + ", Maliyet: " + cost + ", Ağırlık: " + weight + ", Stok: " + stock + ")");
+                        logger.log("Hardware added: " + name + " (ID: " + id + ", Cost: " + cost + ", Weight: " + weight + ", Stock: " + stock + ")");
                         break;
                     default:
-                        logger.log("Hata: Bilinmeyen bileşen tipi: " + type + " - Bileşen: " + name);
+                        logger.log("Error: Unknown component type: " + type + " - Component: " + name);
                         errorCount++;
                         continue;
                 }
@@ -127,13 +115,13 @@ public class ComponentRepository {
                 components.add(component);
                 successCount++;
             } catch (Exception e) {
-                logger.log("Beklenmeyen hata: " + e.getMessage() + " kayıt işlenemedi: " + record);
+                logger.log("Unexpected error: " + e.getMessage() + " Record processing failed: " + record);
                 errorCount++;
             }
         }
 
-        logger.log("Bileşen yükleme tamamlandı. Başarılı: " + successCount + ", Hatalı: " + errorCount);
-        logger.log("Toplam bileşen sayısı: " + components.size());
+        logger.log("Component installation completed. Success: " + successCount + ", Incorrect: " + errorCount);
+        logger.log("Total number of components: " + components.size());
     }
 
     public List<Component> getAll() {
@@ -146,12 +134,11 @@ public class ComponentRepository {
                 .findFirst()
                 .orElse(null);
     }
-    
-    // Bileşen adına göre bileşen bulma metodu
+
     public Component findByName(String name) {
         return components.stream()
                 .filter(c -> c.getName().equals(name))
                 .findFirst()
                 .orElse(null);
     }
-} 
+}

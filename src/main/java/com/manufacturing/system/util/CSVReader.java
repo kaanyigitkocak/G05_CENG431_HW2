@@ -8,15 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * CSV dosyalarını okumak için yardımcı sınıf
- */
 public class CSVReader {
     
     /**
-     * Bileşenleri CSV dosyasından okur
-     * @param filePath CSV dosya yolu
-     * @return Okunan bileşenler
+     * Read components from CSV file
+     * @param filePath path for CSV file
+     * @return Mapped file data
      */
     public static Map<String, Component> readComponents(String filePath) {
         Map<String, Component> componentMap = new HashMap<>();
@@ -28,7 +25,6 @@ public class CSVReader {
                 String type = record.get("type");
                 String name = record.get("name");
                 
-                // Sayısal değerleri dönüştür
                 double cost = 0.0;
                 try {
                     String costStr = record.get("cost");
@@ -36,7 +32,7 @@ public class CSVReader {
                         cost = Double.parseDouble(costStr);
                     }
                 } catch (NumberFormatException e) {
-                    System.err.println("Geçersiz maliyet değeri: " + record.get("cost"));
+                    System.err.println("Invalid weight value: " + record.get("cost"));
                     continue;
                 }
                 
@@ -47,7 +43,7 @@ public class CSVReader {
                         weight = Double.parseDouble(weightStr);
                     }
                 } catch (NumberFormatException e) {
-                    System.err.println("Geçersiz ağırlık değeri: " + record.get("weight"));
+                    System.err.println("Invalid weight value: " + record.get("weight"));
                     continue;
                 }
                 
@@ -58,7 +54,7 @@ public class CSVReader {
                         stock = Integer.parseInt(stockStr);
                     }
                 } catch (NumberFormatException e) {
-                    System.err.println("Geçersiz stok değeri: " + record.get("stock"));
+                    System.err.println("Invalid stock value: " + record.get("stock"));
                     continue;
                 }
                 
@@ -76,14 +72,14 @@ public class CSVReader {
                             component = new Hardware(id, name, cost, weight, stock);
                             break;
                         default:
-                            System.out.println("Bilinmeyen bileşen türü: " + type);
+                            System.out.println("Unknown component type: " + type);
                             continue;
                     }
                     
                     componentMap.put(id, component);
                 }
             } catch (Exception e) {
-                System.err.println("Bileşen işlenirken hata: " + e.getMessage());
+                System.err.println("Error while rendering component: " + e.getMessage());
             }
         }
         
@@ -91,10 +87,10 @@ public class CSVReader {
     }
     
     /**
-     * Ürünleri CSV dosyasından okur
-     * @param filePath CSV dosya yolu
-     * @param componentMap Daha önce okunan bileşenler
-     * @return Ürün ve üretim miktarı listesi
+     * Reads products from CSV file
+     * @param filePath path for CSV file
+     * @param componentMap mapped component data
+     * @return List of products and production quantities
      */
     public static List<ProductionOrder> readProducts(String filePath, Map<String, Component> componentMap) {
         List<ProductionOrder> orders = new ArrayList<>();
@@ -105,19 +101,18 @@ public class CSVReader {
                 String id = record.get("id");
                 String name = record.get("name");
                 
-                int quantity = 1; // Varsayılan değer
+                int quantity = 1; // Default value
                 try {
                     String quantityStr = record.get("quantity");
                     if (quantityStr != null && !quantityStr.isEmpty()) {
                         quantity = Integer.parseInt(quantityStr);
                     }
                 } catch (NumberFormatException e) {
-                    System.err.println("Geçersiz miktar değeri: " + record.get("quantity"));
+                    System.err.println("Invalid quantity value " + record.get("quantity"));
                 }
                 
                 Product product = new Product(id, name, 0);
                 
-                // Component_ids ve component_quantities CSV formatına göre işlenir
                 String componentIdsStr = record.get("component_ids");
                 String componentQtysStr = record.get("component_quantities");
                 
@@ -133,23 +128,20 @@ public class CSVReader {
                         if (component != null) {
                             product.add(component, componentQty);
                         } else {
-                            System.out.println("Ürün " + id + " için bileşen bulunamadı: " + componentId);
+                            System.out.println("Product " + id + " could not be found: " + componentId);
                         }
                     }
                 }
                 
                 orders.add(new ProductionOrder(product, quantity));
             } catch (Exception e) {
-                System.err.println("Ürün işlenirken hata: " + e.getMessage());
+                System.err.println("Error while rendering product: " + e.getMessage());
             }
         }
         
         return orders;
     }
-    
-    /**
-     * Ürün ve üretim miktarı bilgilerini tutan iç sınıf
-     */
+
     public static class ProductionOrder {
         private final Product product;
         private final int quantity;
