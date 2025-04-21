@@ -10,8 +10,8 @@ com/manufacturing/system/domain/state/CompletedState.class
 com/manufacturing/system/domain/model/Product.class
 com/manufacturing/system/presentation/Logger.class
 com/manufacturing/system/domain/state/ManufacturingState.class
-com/manufacturing/system/domain/state/InManufacturingState.class
 com/manufacturing/system/Application.class
+com/manufacturing/system/domain/state/InManufacturingState.class
 com/manufacturing/system/domain/model/Paint.class
 com/manufacturing/system/application/ManufacturingService.class
 com/manufacturing/system/domain/model/RawMaterial.class

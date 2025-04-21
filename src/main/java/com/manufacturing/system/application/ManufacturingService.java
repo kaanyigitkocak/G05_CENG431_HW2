@@ -9,6 +9,8 @@ import com.manufacturing.system.presentation.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import com.manufacturing.system.data.FileParser;
 
 public class ManufacturingService {
     private final ComponentRepository componentRepository;
@@ -31,7 +33,7 @@ public class ManufacturingService {
         logger.log("Products are loading...");
         productRepository.loadProducts();
         
-        createSampleProductionOrders();
+        createProductionOrders();
         
         logger.log("\n=== Production Begins ===");
         
@@ -54,15 +56,34 @@ public class ManufacturingService {
         return generateSummaryReport();
     }
 
-    private void createSampleProductionOrders() {
-        List<Product> products = productRepository.getAll();
-        
+    private void createProductionOrders() {
         logger.log("Creating production orders...");
-
-        for (Product product : products) {
-            ProductionOrder order = new ProductionOrder(product, 1);
-            productRepository.addProductionOrder(order);
-            logger.log("Order created: " + product.getName() + " - 1 quantity");
+        List<Map<String, String>> records = FileParser.parseCSV("src/main/resources/products.csv");
+        
+        for (Map<String, String> record : records) {
+            String productName = record.get("Product Name");
+            String quantityStr = record.get("Quantity");
+            
+            if (productName == null || quantityStr == null) {
+                continue;
+            }
+            
+            Product product = productRepository.findByName(productName);
+            if (product == null) {
+                logger.log("Warning: Product not found: " + productName);
+                continue;
+            }
+            
+            try {
+                int quantity = Integer.parseInt(quantityStr.trim());
+                if (quantity > 0) {
+                    ProductionOrder order = new ProductionOrder(product, quantity);
+                    productRepository.addProductionOrder(order);
+                    logger.log("Order created: " + product.getName() + " - " + quantity + " quantity");
+                }
+            } catch (NumberFormatException e) {
+                logger.log("Error: Invalid quantity for product " + productName + ": " + quantityStr);
+            }
         }
         
         logger.log("Total " + productRepository.getProductionOrders().size() + " order created.");
