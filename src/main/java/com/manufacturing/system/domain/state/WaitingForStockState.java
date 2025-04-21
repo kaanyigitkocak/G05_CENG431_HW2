@@ -7,7 +7,6 @@ public class WaitingForStockState implements ManufacturingState {
     public void handle(ManufacturingProcess context) {
         System.out.println("Stock control is being carried out...");
         
-        // Ürünün bileşenlerinin stok kontrolü
         if (context.getProduct().checkComponentsStock()) {
             System.out.println("The stock is sufficient. The production phase is starting.");
             context.setState(new InManufacturingState());
