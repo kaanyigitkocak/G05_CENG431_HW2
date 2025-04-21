@@ -8,6 +8,15 @@ public class RandomGenerator {
     private RandomGenerator() { }
     
     /**
+     * Sets the seed of the random number generator
+     * This is useful for testing to ensure consistent results
+     * @param seed the seed to set
+     */
+    public static void setSeed(long seed) {
+        random.setSeed(seed);
+    }
+    
+    /**
      * Generates random numbers in the specified range
      * @param min Minimum value
      * @param max Maximum value
@@ -23,6 +32,15 @@ public class RandomGenerator {
      */
     public static int generateManufacturingOutcome() {
         return generateNumber(1, 3);
+    }
+    
+    /**
+     * Determines if there will be a stock shortage
+     * @return true if there will be a stock shortage, false otherwise
+     */
+    public static boolean shouldSimulateStockShortage() {
+        // 15% chance of stock shortage
+        return random.nextDouble() < 0.15;
     }
     
     /**
